@@ -1,6 +1,7 @@
 import requests
 import os
 import uuid
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,9 +21,7 @@ def list_droplets():
     return res.json()["droplets"]
 
 
-def create_droplet(ssh_key="dodocker"):
-    with open(f"keys/{ssh_key}.pub", "r") as f:
-        ssh_key = f.read()
+def create_droplet(ssh_key):
     res = requests.post(
         "https://api.digitalocean.com/v2/droplets",
         headers={
@@ -82,3 +81,13 @@ def list_ssh_keys():
     if res.status_code != 200:
         raise ApiError(res.json())
     return res.json()["ssh_keys"]
+
+
+def delete_ssh_key(key_id):
+    res = requests.delete(
+        f"https://api.digitalocean.com/v2/account/keys/{key_id}",
+        headers={"Authorization": f"Bearer {TOKEN}"},
+    )
+    if res.status_code != 204:
+        raise ApiError(res.json())
+    return 0
